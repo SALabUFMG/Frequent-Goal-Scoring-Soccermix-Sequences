@@ -15,8 +15,8 @@ class features_transform(d6t.tasks.TaskCSVPandas):
 
     def run(self):
         actions = self.inputLoad()
-        actions.loc[actions.result_id.isin([2, 3]), ['result_id']] = 0
-        actions.loc[actions.result_name.isin(['offside', 'owngoal']), ['result_name']] = 'fail'
+        #actions.loc[actions.result_id.isin([2, 3]), ['result_id']] = 0
+        #actions.loc[actions.result_name.isin(['offside', 'owngoal']), ['result_name']] = 'fail'
 
         xfns = [
             ft.actiontype_onehot,
@@ -25,6 +25,10 @@ class features_transform(d6t.tasks.TaskCSVPandas):
             ft.goalscore,
             ft.startlocation,
             ft.endlocation,
+            ft.movement,
+            ft.space_delta,
+            ft.startpolar,
+            ft.endpolar,
             ft.team,
             ft.time,
             ft.time_delta

@@ -8,6 +8,7 @@ from training import *
 from predictions import *
 
 competitions = ['England','Spain']
+train_comps = ['Italy','France','Germany']
 
 # Load data
 actions = {}
@@ -34,7 +35,7 @@ players_task = load_players()
 d6t.run(players_task)
 players = players_task.outputLoad()
 
-teams_task = load_players()
+teams_task = load_teams()
 d6t.run(teams_task)
 teams = teams_task.outputLoad()
 
@@ -42,7 +43,7 @@ vaep_task = calculate_action_values(competition='England', train_comps=['Spain']
 d6t.run(vaep_task)
 vaep = vaep_task.outputLoad()
 
-df = vaep.merge(players, on='player_id')
+df = vaep.merge(players, on='player_id').merge(teams, on='team_id')
 
 minutes_per_player = minutes['England'].groupby('player_id', as_index=False)['minutes_played'].sum()
 

@@ -33,6 +33,8 @@ class train_vaep(d6t.tasks.TaskPickle):
             y_train_pred = models[m].predict_proba(X_train)[:, 1]
             train_brier = mt.brier_score_loss(y_train[m], y_train_pred) / mt.brier_score_loss(y_train[m], base)
             print(m + ' Train NBS: ' + str(train_brier))
+            roc_auc_score = mt.roc_auc_score(y_train[m], y_train_pred)
+            print(f"  ROC AUC: %.5f" % roc_auc_score(y_train[m], y_train_pred))
             print()
 
             p = sum(y_test[m]) / len(y_test[m])
@@ -40,6 +42,8 @@ class train_vaep(d6t.tasks.TaskPickle):
             y_test_pred = models[m].predict_proba(X_test)[:, 1]
             test_brier = mt.brier_score_loss(y_test[m], y_test_pred) / mt.brier_score_loss(y_test[m], base)
             print(m + ' Test NBS: ' + str(test_brier))
+            roc_auc_score = mt.roc_auc_score(y_test[m], y_test_pred)
+            print(f"  ROC AUC: %.5f" % roc_auc_score(y_train[m], y_train_pred))
             print()
 
             print('----------------------------------------')
