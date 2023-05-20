@@ -2,11 +2,30 @@ import d6tflow as d6t
 import pandas as pd
 from tqdm import tqdm
 
+import socceraction.spadl as spadl
+
 class WyLoader(d6t.tasks.TaskCSVPandas):
-    competitions = d6t.ListParameter()
+    competition = d6t.ListParameter()
+    path = d6t.Parameter(default='data/')
+
+    def requires(self):
+        return load_matches(self.path, self.competition), load_events(self.path), load_minutes_played_per_game(self.path)
 
     def run(self):
-      print()  
+        events = self.input()['events'].load()
+        matches = self.input()['matches'].load()
+
+        actions = []
+        game_ids = events.game_id.unique().tolist()
+        for g in tqdm(game_ids, desc='Converting {} events to SPADL'.format(self.competition)):
+            match_events = events.loc[events.game_id == g]
+            match_home_id = matches.loc[(matches.matchId == g) & (matches.side == 'home'), 'teamId'].values[0]
+            match_actions = spadl.wyscout.convert_to_actions(events=match_events, home_team_id=match_home_id)
+            match_actions = spadl.play_left_to_right(actions=match_actions, home_team_id=match_home_id)
+            match_actions = spadl.add_names(match_actions)
+            actions.append(match_actions)
+        actions = pd.concat(actions).reset_index(drop=True)
+        self.save(actions)
 
 
 class load_matches(d6t.tasks.TaskCSVPandas):
