@@ -22,7 +22,7 @@ class train_vaep(d6t.tasks.TaskPickle):
         y_test = self.input()['y_test'].load()
 
         models = {}
-        for m in ['scores', 'concedes']:
+        for m in tqdm(['scores', 'concedes']):
             models[m] = xgb.XGBClassifier(random_state=0, n_estimators=50, max_depth=3)
 
             print('training ' + m + ' model')
@@ -84,4 +84,10 @@ class LoadTrainTestData(d6t.tasks.TaskCSVPandas):
         X_train = pd.concat(train_features).reset_index(drop=True)
         y_train = pd.concat(train_labels).reset_index(drop=True)
 
-        self.save(X_train, y_train, X_test, y_test)
+
+        self.save({
+            'X_train':X_train,
+            'y_train':y_train,
+            'X_test':X_test,
+            'y_test':y_test
+        })

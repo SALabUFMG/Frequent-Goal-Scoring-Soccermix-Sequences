@@ -45,7 +45,6 @@ class load_matches(d6t.tasks.TaskCSVPandas):
         self.save(team_matches) 
 
 class load_players(d6t.tasks.TaskCSVPandas):
-    competition = d6t.Parameter()
 
     def run(self):
         players_path = r"H:\Documentos\SaLab\Soccermatics\Wyscout Data\players.json"
@@ -54,6 +53,16 @@ class load_players(d6t.tasks.TaskCSVPandas):
         players['player_name'] = players['player_name'].str.decode('unicode-escape')
 
         self.save(players) 
+
+class load_teams(d6t.tasks.TaskCSVPandas):
+
+    def run(self):
+        teams_path = r"H:\Documentos\SaLab\Soccermatics\Wyscout Data\teams.json"
+        teams = pd.read_json(path_or_buf=teams_path)
+        teams = teams[['wyId', 'name']].rename(columns={'wyId': 'team_id', 'name': 'team_name'})
+        teams['team_name'] = teams['team_name'].str.decode('unicode-escape')
+
+        self.save(teams) 
 
 class load_events(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()
@@ -84,8 +93,8 @@ class load_minutes_played_per_game(d6t.tasks.TaskCSVPandas):
             'playerId': 'player_id',
             'matchId': 'game_id',
             'teamId': 'team_id',
-            'minutesPlayed': 'minutes_played'
+            'minutesPlayed': 'minutes_played',
         })
         minutes = minutes.drop(['shortName', 'teamName', 'red_card'], axis=1)
-
+        minutes['shortName'] = minutes['player_name'].str.decode('unicode-escape')
         self.save(minutes)

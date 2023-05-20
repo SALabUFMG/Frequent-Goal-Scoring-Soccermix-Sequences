@@ -9,7 +9,7 @@ from training import train_vaep
 from features import features_transform
 from loader import WyLoader
 
-class generate_predictions():
+class generate_predictions(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()
     train_comps = d6t.ListParameter()
 
@@ -35,12 +35,12 @@ class calculate_action_values(d6t.tasks.TaskCSVPandas):
         return generate_predictions(competition=self.competition, train_comps=self.train_comps), WyLoader(competition=self.competition)
 
     def run(self):
-        predictions = self.inputLoad()
-        actions = self.inputLoad()
+        predictions = self.input()[0].load()
+        actions = self.input()[1].load()
         action_values = fm.value(actions=actions, Pscores=predictions['scores'], Pconcedes=predictions['concedes'])
-        print(action_values.head(10))
+        print("Calculating action values for {}".format(self.competition))
         action_values = pd.concat([
-            actions[['original_event_id','player_id','action_id', 'game_id', 'start_x', 'start_y', 'end_x', 'end_y', 'type_name', 'result_name']],
+            actions[['original_event_id','player_id','team_id','action_id', 'game_id', 'start_x', 'start_y', 'end_x', 'end_y', 'type_name', 'result_name']],
             predictions.rename(columns={'scores': 'Pscores', 'concedes': 'Pconcedes'}),
             action_values
         ], axis=1)

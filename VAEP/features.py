@@ -31,7 +31,7 @@ class features_transform(d6t.tasks.TaskCSVPandas):
         ]
 
         features = []
-        for game in tqdm(np.unique(actions.game_id).tolist()):
+        for game in tqdm(np.unique(actions.game_id).tolist(), desc='Generating features for {}'.format(self.competition)):
             match_actions = actions.loc[actions.game_id == game].reset_index(drop=True)
             match_states = ft.gamestates(actions=match_actions)
             match_feats = pd.concat([fn(match_states) for fn in xfns], axis=1)

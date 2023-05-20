@@ -18,7 +18,7 @@ class labels_transform(d6t.tasks.TaskCSVPandas):
         yfns = [lab.scores, lab.concedes]
 
         labels = []
-        for game in tqdm(np.unique(actions.game_id).tolist()):
+        for game in tqdm(np.unique(actions.game_id).tolist(), desc='Generating labels for {}'.format(self.competition)):
             match_actions = actions.loc[actions.game_id == game].reset_index(drop=True)
             labels.append(pd.concat([fn(actions=match_actions) for fn in yfns], axis=1))
 
