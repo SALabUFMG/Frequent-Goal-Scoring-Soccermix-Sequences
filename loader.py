@@ -1,6 +1,7 @@
 import d6tflow as d6t
 import pandas as pd
 from tqdm import tqdm
+from ast import literal_eval
 
 import socceraction.spadl as spadl
 
@@ -13,7 +14,8 @@ class WyLoader(d6t.tasks.TaskCSVPandas):
     def run(self):
         matches = self.input()[0].load()
         events = self.input()[1].load()
-
+        events['tags'] = events['tags'].apply(literal_eval)
+        events['positions'] = events['positions'].apply(literal_eval)
         actions = []
         game_ids = events.game_id.unique().tolist()
         for g in tqdm(game_ids, desc='Converting {} events to SPADL'.format(self.competition)):
