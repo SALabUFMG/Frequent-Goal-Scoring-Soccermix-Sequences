@@ -4,12 +4,16 @@ from tqdm import tqdm
 
 import socceraction.spadl as spadl
 
+events_path = "H:\Documentos\SaLab\Soccermatics\Wyscout Data\events_{}.json".format()
+matches_path = "H:\Documentos\SaLab\Soccermatics\Wyscout Data\events_{}.json".format()
+players_path = "H:\Documentos\SaLab\Soccermatics\Wyscout Data\players.json"
+minutes_path = "H:\Documentos\SaLab\Soccermatics\Wyscout Data\minutes_played_per_game_{}.json".format()
+
 class WyLoader(d6t.tasks.TaskCSVPandas):
     competition = d6t.ListParameter()
-    path = d6t.Parameter(default='data/')
 
     def requires(self):
-        return load_matches(self.path, self.competition), load_events(self.path), load_minutes_played_per_game(self.path)
+        return load_matches(self.competition), load_events(self.competition), load_minutes_played_per_game(self.competition)
 
     def run(self):
         events = self.input()['events'].load()
@@ -29,11 +33,10 @@ class WyLoader(d6t.tasks.TaskCSVPandas):
 
 
 class load_matches(d6t.tasks.TaskCSVPandas):
-    path = d6t.Parameter()
     competition = d6t.Parameter()
 
     def run(self):
-        matches = pd.read_json(path_or_buf=self.path)
+        matches = pd.read_json(path_or_buf=matches_path.format(self.competition))
         team_matches = []
         for i in tqdm(range(len(matches)), desc='Loading {} matches'.format(self.competition)):
             match = pd.DataFrame(matches.loc[i, 'teamsData']).T
@@ -44,18 +47,20 @@ class load_matches(d6t.tasks.TaskCSVPandas):
         self.save(team_matches) 
 
 class load_players(d6t.tasks.TaskCSVPandas):
-    path = d6t.Parameter()
+    competition = d6t.Parameter()
+
     def run(self):
-        players = pd.read_json(path_or_buf=self.path)
+        players = pd.read_json(path_or_buf=self.players_path)
         players = players[['wyId', 'shortName']].rename(columns={'wyId': 'player_id', 'shortName': 'player_name'})
         players['player_name'] = players['player_name'].str.decode('unicode-escape')
 
         self.save(players) 
 
 class load_events(d6t.tasks.TaskCSVPandas):
-    path = d6t.Parameter()
+    competition = d6t.Parameter()
+
     def run(self):
-        events = pd.read_json(path_or_buf=self.path)
+        events = pd.read_json(path_or_buf=self.events_path.format(self.competition))
         events = events.rename(columns={
             'id': 'event_id',
             'eventId': 'type_id',
@@ -70,9 +75,10 @@ class load_events(d6t.tasks.TaskCSVPandas):
         self.save(events) 
 
 class load_minutes_played_per_game(d6t.tasks.TaskCSVPandas):
-    path = d6t.Parameter()
+    competition = d6t.Parameter()
+
     def run(self):
-        minutes = pd.read_json(path_or_buf=self.path)
+        minutes = pd.read_json(path_or_buf=self.minutes_path.format(self.competition))
         minutes = minutes.rename(columns={
             'playerId': 'player_id',
             'matchId': 'game_id',
