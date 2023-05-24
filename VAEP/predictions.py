@@ -40,9 +40,9 @@ class calculate_action_values(d6t.tasks.TaskCSVPandas):
         action_values = fm.value(actions=actions, Pscores=predictions['scores'], Pconcedes=predictions['concedes'])
         print("Calculating action values for {}".format(self.competition))
         action_values = pd.concat([
-            actions[['original_event_id','player_id','team_id','action_id', 'game_id', 'start_x', 'start_y', 'end_x', 'end_y', 'type_name', 'result_name']],
+            actions[['original_event_id','player_id','team_id','action_id', 'game_id','period_id','time_seconds', 'start_x', 'start_y', 'end_x', 'end_y', 'type_name', 'result_name']],
             predictions.rename(columns={'scores': 'Pscores', 'concedes': 'Pconcedes'}),
             action_values
         ], axis=1)
-
+        
         self.save(action_values)

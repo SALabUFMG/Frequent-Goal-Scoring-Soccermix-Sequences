@@ -42,12 +42,14 @@ teams = teams_task.outputLoad()
 en_vaep_task = calculate_action_values(competition='England', train_comps=train_comps)
 d6t.run(en_vaep_task)
 vaepEngland = en_vaep_task.outputLoad()
+vaepEngland = vaepEngland.sort_values(by=['game_id','period_id','time_seconds'], ascending=True)
 
 sp_vaep_task = calculate_action_values(competition='Spain', train_comps=train_comps)
 d6t.run(sp_vaep_task)
 vaepSpain = sp_vaep_task.outputLoad()
 
 vaep = pd.concat([vaepEngland, vaepSpain],axis=0).reset_index(drop=True)
+
 
 df = vaep.merge(players, on='player_id').merge(teams, on='team_id')
 df.to_csv('vaepActions.csv',index=True)
