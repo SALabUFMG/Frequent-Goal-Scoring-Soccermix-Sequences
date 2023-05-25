@@ -2,3 +2,7 @@ data/
 __pycache__/
 .idea/
 *.csv
+*.out
+*.out.clean
+*.closed
+*.txt
