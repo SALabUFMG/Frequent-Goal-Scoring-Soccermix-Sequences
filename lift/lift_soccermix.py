@@ -5,8 +5,8 @@ from tqdm import tqdm
 
 
 def readData(team_id):
-    out_path = r"H:\Documentos\SaLab\Frequent-Goal-Scoring-Soccermix-Sequences\lift\soccermix\{}.out.clean".format(team_id)
-    in_path = r"H:\Documentos\SaLab\Frequent-Goal-Scoring-Soccermix-Sequences\lift\soccermix\{}.txt".format(team_id)
+    out_path = r"H:\Documentos\SaLab\Frequent-Goal-Scoring-Soccermix-Sequences\lift\soccermix\{}.out".format(team_id)
+    in_path = r"H:\Documentos\SaLab\Frequent-Goal-Scoring-Soccermix-Sequences\lift\soccermix\{}.in".format(team_id)
     
     with open(out_path, 'r') as file:
         lines = file.readlines()
@@ -80,9 +80,9 @@ def calculateLift(df, team_id):
     df.to_csv("soccermix/lift_spmf_{}.csv".format(team_id), index=False, header=True)
     return df
     
-team_ids = [1613,1673,1659,1651,1646,1631,1633,1639,1644,1623,1627,1624,1628,
+team_ids = [1613,1673,1659,1651,1646,1631,1633,1639,1644,1623,1625,1627,1624,1628,
             1619, 1612, 1610, 1611, 1609, 10531]
-#team_ids = [1625]
+
 teams_df = {}
 for team_id in tqdm(team_ids, desc="iterando pelos times", total=len(team_ids)):
     df = readData(team_id)
