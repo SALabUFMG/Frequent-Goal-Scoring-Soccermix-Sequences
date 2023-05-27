@@ -1,9 +1,7 @@
 import d6tflow as d6t
 import sys
 sys.path.append("H:\Documentos\SaLab\Frequent-Goal-Scoring-Soccermix-Sequences")
-from loader import *
-from features import *
-from labels import *
+from DataProcessing.loader import *
 from training import *
 from predictions import *
 

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from tqdm import tqdm
 import d6tflow as d6t
 
@@ -7,7 +6,7 @@ import socceraction.vaep.formula as fm
 
 from training import train_vaep
 from features import features_transform
-from loader import WyLoader
+from DataProcessing.loader import WyLoader
 
 class generate_predictions(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()

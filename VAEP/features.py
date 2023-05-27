@@ -5,7 +5,7 @@ import numpy as np
 
 from socceraction.vaep import features as ft
 
-from loader import WyLoader
+from DataProcessing.loader import WyLoader
 
 class features_transform(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()

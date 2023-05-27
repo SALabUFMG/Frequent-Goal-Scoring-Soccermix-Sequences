@@ -5,7 +5,7 @@ import d6tflow as d6t
 
 from socceraction.vaep import labels as lab
 
-from loader import WyLoader
+from DataProcessing.loader import WyLoader
 
 class labels_transform(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()
