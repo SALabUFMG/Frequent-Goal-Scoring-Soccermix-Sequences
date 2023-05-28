@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import math
 
-
 def dual_axes(figsize=4):
     fig, axs = plt.subplots(1, 2)
     fig.set_size_inches((figsize * 3, figsize))
@@ -133,8 +132,7 @@ def show_all_models(loc_models, dir_models):
                                 dx = np.cos(vonmises.loc)[0]
                                 dy = np.sin(vonmises.loc)[0]
                                 r = vonmises.R[0]
-                                add_arrow(ax, x, y, 10*dx, 10*dy, 
-                                              linewidth=0.5)
+                                add_arrow(ax, x, y, 10*dx, 10*dy, linewidth=0.5)
                         
         plt.show()
         

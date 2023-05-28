@@ -16,6 +16,7 @@ from ZoneSequences import zone_sequences as zs
 
 from mining import zone
 from mining import soccermix as sm
+from mining import pareto as par
 
 d6t.settings
 
@@ -23,7 +24,11 @@ d6t.settings
 
 #d6t.run(sms.SoccerMixSequences(competition='England', loc_and_dir=False))
 
-teams = [1609, 1631, 1625, 1651, 1646, 1610, 1628, 1673, 1623, 1639, 1611, 1633, 1613, 1624, 10531, 1619, 1644, 1612, 1627, 1659]
+#d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=True, team_id=1625, pscores_threshold=0.02))
+
+d6t.run(par.LoadParetoFrontiersZone(competition='England', action_types=['pass', 'cross', 'dribble', 'take_on', 'shot'], team_id=1625, pscores_threshold=0.02))
+
+'''teams = [1609, 1631, 1625, 1651, 1646, 1610, 1628, 1673, 1623, 1639, 1611, 1633, 1613, 1624, 10531, 1619, 1644, 1612, 1627, 1659]
 for t in tqdm(teams):
-    #d6t.run(sm.SoccerMixSeq2txt(competition='England', loc_and_dir=True, team_id=t, pscores_threshold=0.02))
-    d6t.run(zone.GridSeq2txt(competition='England', action_types=['pass', 'cross', 'dribble', 'take_on', 'shot'], team_id=t, pscores_threshold=0.))
+    d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=True, team_id=t, pscores_threshold=0.02))
+    d6t.run(zone.GridSeq2txt(competition='England', action_types=['pass', 'cross', 'dribble', 'take_on', 'shot'], team_id=t, pscores_threshold=0.))'''
