@@ -1,25 +1,13 @@
 # Library imports
 import os
-import numpy as np
 import pandas as pd
 import d6tflow as d6t
-from tqdm import tqdm
-import ast
-from pycspade.helpers import spade, print_result
-from socceraction.vaep import features as vaep
-from socceraction.atomic.vaep import features as avaep
-
-# Project imports
-from data_processing import loaders as ld
-from soccer_mix.MixtureModels import sequences as sq
-from vaeps import predictions as pr
-from vaeps import action_values as av
-from mining import zone as zn
 from mining import soccermix as sm
 
 @d6t.inherits(sm.SoccerMixSeq2txt)
 class LoadParetoFrontiersSoccerMix(d6t.tasks.TaskCSVPandas):
     persist = ['sequences', 'instances']
+    pareto = d6t.Parameter(default=' ')
 
     def run(self):
         if self.loc_and_dir:
@@ -27,7 +15,7 @@ class LoadParetoFrontiersSoccerMix(d6t.tasks.TaskCSVPandas):
         else:
             sm_type = 'loc_only'
 
-        directory = d6t.settings.dir + r'\pareto_soccermix_{}_{}'.format(sm_type, self.pscores_threshold)
+        directory = d6t.settings.dir + r'\pareto_soccermix_{}_{}\pareto{}'.format(sm_type, self.pscores_threshold, self.pareto)
 
         # Get all file names in the directory
         team_files = [f for f in os.listdir(directory) if str(self.team_id) in f and '.frontier' in f]
@@ -38,6 +26,7 @@ class LoadParetoFrontiersSoccerMix(d6t.tasks.TaskCSVPandas):
         sequences = []
         supports = []
         vaeps = []
+        pscores = []
         lifts = []
         for i in range(len(team_files)):
             with open(directory + '\\' + team_files[i], 'r') as file:
@@ -50,9 +39,10 @@ class LoadParetoFrontiersSoccerMix(d6t.tasks.TaskCSVPandas):
                     frontiers.append(i + 1)
                     supports.append(int(l[3]))
                     vaeps.append(float(l[5]))
+                    pscores.append(float(l[7]))
                     lifts.append(float(l[-1]))
                     seq = []
-                    for j in range(6, len(l) - 4):
+                    for j in range(8, len(l) - 4):
                         if l[j] != '-1':
                             seq.append(int(l[j]))
                     sequences.append(seq)
@@ -63,6 +53,7 @@ class LoadParetoFrontiersSoccerMix(d6t.tasks.TaskCSVPandas):
             'sequence': sequences,
             'support': supports,
             'vaep': vaeps,
+            'pscores': pscores,
             'lift': lifts
         })
 
@@ -76,7 +67,7 @@ class LoadParetoFrontiersZone(d6t.tasks.TaskCSVPandas):
     persist = ['sequences', 'instances']
 
     def run(self):
-        directory = d6t.settings.dir + r'\pareto_zones_{}'.format(self.pscores_threshold)
+        directory = d6t.settings.dir + r'\pareto_zones_0.02\paretoC'
 
         # Get all file names in the directory
         team_files = [f for f in os.listdir(directory) if str(self.team_id) in f and '.frontier' in f]
@@ -87,6 +78,7 @@ class LoadParetoFrontiersZone(d6t.tasks.TaskCSVPandas):
         sequences = []
         supports = []
         vaeps = []
+        pscores = []
         lifts = []
         for i in range(len(team_files)):
             with open(directory + '\\' + team_files[i], 'r') as file:
@@ -99,9 +91,10 @@ class LoadParetoFrontiersZone(d6t.tasks.TaskCSVPandas):
                     frontiers.append(i + 1)
                     supports.append(int(l[3]))
                     vaeps.append(float(l[5]))
+                    pscores.append(float(l[7]))
                     lifts.append(float(l[-1]))
                     seq = []
-                    for j in range(6, len(l) - 4):
+                    for j in range(8, len(l) - 4):
                         if l[j] != '-1':
                             seq.append(int(l[j]))
                     sequences.append(seq)
@@ -112,6 +105,7 @@ class LoadParetoFrontiersZone(d6t.tasks.TaskCSVPandas):
             'sequence': sequences,
             'support': supports,
             'vaep': vaeps,
+            'pscores': pscores,
             'lift': lifts
         })
 

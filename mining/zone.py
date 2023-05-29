@@ -5,7 +5,7 @@ import pandas as pd
 import d6tflow as d6t
 from tqdm import tqdm
 import ast
-from pycspade.helpers import spade, print_result
+#from pycspade.helpers import spade, print_result
 from socceraction.vaep import features as vaep
 from socceraction.atomic.vaep import features as avaep
 
@@ -56,7 +56,7 @@ class MineZones(d6t.tasks.TaskCSVPandas):
                         row = '{} {} 1 {}'.format(seq_ids[i], j + 1, team_seqs[i][j])
                         file.write(row + '\n')
 
-        mined_seqs = spade(filename=file_path, support=0.001)['mined_objects']
+        #mined_seqs = spade(filename=file_path, support=0.001)['mined_objects']
 
         self.save({'actions': actions, 'sequences': sequences})
 

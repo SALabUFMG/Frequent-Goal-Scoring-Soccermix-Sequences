@@ -13,7 +13,7 @@ from socceraction.atomic import spadl as aspadl
 # Project imports
 
 # Wyscout PATH
-PATH = r"C:\Users\Galo\Hugo_Personal\Data\Wyscout_Top_5"
+PATH = r"H:/Documentos/SaLab/Soccermatics/Wyscout Data"
 
 class CompetitionsLoader(d6t.tasks.TaskCSVPandas):
     def run(self):

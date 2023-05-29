@@ -5,7 +5,7 @@ import pandas as pd
 import d6tflow as d6t
 from tqdm import tqdm
 import ast
-from pycspade.helpers import spade, print_result
+#from pycspade.helpers import spade
 from socceraction.vaep import features as vaep
 from socceraction.atomic.vaep import features as avaep
 
@@ -56,7 +56,7 @@ class MineSoccerMix(d6t.tasks.TaskPickle):
                         row += ' '.join(str(item) for item in team_seqs[i][j])
                         file.write(row + '\n')
 
-        mined_seqs = spade(filename=file_path, support=0.01)['mined_objects']
+        #mined_seqs = spade(filename=file_path, support=0.01)['mined_objects']
 
         self.save(mined_seqs)
 

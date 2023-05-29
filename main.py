@@ -1,34 +1,63 @@
 import d6tflow as d6t
-from tqdm import tqdm
-
-from vaeps import predictions as pr
-from vaeps import action_values as av
-
-from soccer_mix.MixtureModels import dataprocessing as dp
-from soccer_mix.MixtureModels import categoricalmodel as cm
-from soccer_mix.MixtureModels import locationmodel as lm
-from soccer_mix.MixtureModels import directionmodel as dm
-from soccer_mix.MixtureModels import actions_clusters as ac
-from soccer_mix.MixtureModels import sequences as sms
-
-from ZoneSequences import actions_zones as az
-from ZoneSequences import zone_sequences as zs
-
-from mining import zone
-from mining import soccermix as sm
 from mining import pareto as par
+from visualization import clusters as cl
+from visualization import visualization as vis
+from DataProcessing.loader import load_teams
+from tqdm import tqdm
+import pandas as pd
+import ast
 
 d6t.settings
 
-#d6t.run(av.ValuesAtomicVAEP(competition='England', train_comps=['France', 'Germany', 'Italy']))
+d6t.run(load_teams())
+teams = load_teams().outputLoad()
 
-#d6t.run(sms.SoccerMixSequences(competition='England', loc_and_dir=False))
+team_ids = [1613,1673,1659,1651,1646,1631,1633,1639,1644,1623,1625,1627,1624,1628,
+            1619, 1612, 1610, 1611, 1609, 10531]
 
-#d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=True, team_id=1625, pscores_threshold=0.02))
 
-d6t.run(par.LoadParetoFrontiersZone(competition='England', action_types=['pass', 'cross', 'dribble', 'take_on', 'shot'], team_id=1625, pscores_threshold=0.02))
+pareto = 'B'
 
-'''teams = [1609, 1631, 1625, 1651, 1646, 1610, 1628, 1673, 1623, 1639, 1611, 1633, 1613, 1624, 10531, 1619, 1644, 1612, 1627, 1659]
-for t in tqdm(teams):
-    d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=True, team_id=t, pscores_threshold=0.02))
-    d6t.run(zone.GridSeq2txt(competition='England', action_types=['pass', 'cross', 'dribble', 'take_on', 'shot'], team_id=t, pscores_threshold=0.))'''
+for team_id in team_ids:
+    team = teams.loc[teams['team_id']==team_id].team_name.values[0]
+    d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto))
+    sequences = par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto).output()['sequences'].load()
+    sequences['sequence'] = sequences['sequence'].apply(ast.literal_eval)
+    sequences['len'] = sequences['sequence'].apply(len)
+    sequences = sequences.loc[sequences['len']>1].reset_index(drop=True)
+    seqs = sequences.freq_seq_id.unique().tolist()
+    instances = par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto).output()['instances'].load()
+    instances = instances.rename(columns={'item': 'cluster_id'})
+    instances = instances.loc[instances['freq_seq_id'].isin(seqs)]
+
+    d6t.run(cl.LoadClusters())
+    clusters = cl.LoadClusters().output().load()
+    
+    df = instances.merge(clusters, on='cluster_id', how='left').merge(sequences, on='freq_seq_id', how='left')
+    vis.VisualizeTeam(team=team, df=df, pareto=pareto)
+'''
+
+team_id = 1627
+team = teams.loc[teams['team_id']==team_id].team_name.values[0]
+d6t.run(par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto))
+sequences = par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto).output()['sequences'].load()
+sequences['sequence'] = sequences['sequence'].apply(ast.literal_eval)
+sequences['len'] = sequences['sequence'].apply(len)
+sequences = sequences.loc[sequences['len']>1].reset_index(drop=True)
+instances = par.LoadParetoFrontiersSoccerMix(competition='England', loc_and_dir=False, team_id=team_id, pscores_threshold=0.02, pareto=pareto).output()['instances'].load()
+
+d6t.run(cl.LoadClusters())
+clusters = cl.LoadClusters().output().load()
+seqs = sequences.freq_seq_id.unique().tolist()
+instances = instances.rename(columns={'item': 'cluster_id'})
+instances = instances.loc[instances['freq_seq_id'].isin(seqs)]
+
+df = instances.merge(clusters, on='cluster_id', how='left').merge(sequences, on='freq_seq_id', how='left')
+
+
+
+#df = df.loc[df.freq_seq_id.isin([33])].reset_index(drop=True)
+vis.VisualizeTeam(team=team, df=df, pareto=pareto)
+
+#vis.VisualizeCluster(clusters)
+'''
