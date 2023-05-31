@@ -45,7 +45,7 @@ class MatchesLoader(d6t.tasks.TaskCSVPandas):
     persist = ['matches_general', 'matches_specs']
 
     def run(self):
-        matches_general = pd.read_json(path_or_buf=PATH + '/matches/matches_' + self.competition + '.json')
+        matches_general = pd.read_json(path_or_buf=PATH + '/matches_' + self.competition + '.json')
 
         matches_specs = []
         for i in tqdm(range(len(matches_general))):
@@ -61,7 +61,7 @@ class EventsLoader(d6t.tasks.TaskCSVPandas):
     competition = d6t.Parameter()  # 'England', 'France', 'Germany', 'Italy', 'Spain'
 
     def run(self):
-        events = pd.read_json(path_or_buf=PATH + '/events/events_' + self.competition + '.json')
+        events = pd.read_json(path_or_buf=PATH + '/events_' + self.competition + '.json')
 
         self.save(events)
 

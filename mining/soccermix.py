@@ -122,3 +122,51 @@ class SoccerMixSeq2txt(d6t.tasks.TaskCache):
                         row += ' -1 '
                     row += '-2 {} {}'.format(scores[i], values[i])
                     file.write(row + '\n')
+
+@d6t.inherits(sq.SoccerMixSequences)
+class SoccerMixTeamSeqIDs(d6t.tasks.TaskCSVPandas):
+    team_id = d6t.IntParameter()
+    pscores_threshold = d6t.FloatParameter()
+
+    def requires(self):
+        reqs = {
+            'actions': self.clone(ld.AtomicSPADLLoader),
+            'soccermix_sequences': self.clone(sq.SoccerMixSequences),
+            'vaep_preds': self.clone(pr.PredsAtomicVAEP, train_comps=['France', 'Germany', 'Italy']),
+            'vaep_values': self.clone(av.ValuesAtomicVAEP, train_comps=['France', 'Germany', 'Italy'])
+        }
+        return reqs
+
+    def run(self):
+        actions = self.input()['actions'].load()
+
+        seq_actions = self.input()['soccermix_sequences']['actions'].load()
+        actions = actions.merge(right=seq_actions, on='action_id')
+        del seq_actions
+        actions = actions[actions['team_id'] == self.team_id]
+
+        sequences = self.input()['soccermix_sequences']['sequences'].load()
+        sequences = sequences[sequences['sequence_id'].isin(actions['sequence_id'])]
+        sequences['soccermix_sequence'] = sequences['soccermix_sequence'].apply(ast.literal_eval)
+
+        seq_actions = self.input()['soccermix_sequences']['actions'].load()
+        seq_actions = seq_actions[seq_actions['sequence_id'].isin(actions['sequence_id'])]
+
+        vaep_preds = self.input()['vaep_preds'].load()
+        vaep_values = self.input()['vaep_values'].load()
+
+        seq_actions = seq_actions.merge(right=vaep_preds, on='action_id')
+        seq_actions = seq_actions.merge(right=vaep_values, on='action_id')
+
+        seq_scores = seq_actions.groupby(by='sequence_id', as_index=False)['scores'].last()
+        seq_values = seq_actions.groupby(by='sequence_id', as_index=False)['offensive_value'].sum()
+        sequences = sequences.merge(right=seq_scores, on='sequence_id')
+        sequences = sequences.merge(right=seq_values, on='sequence_id')
+
+        sequences = sequences[sequences['scores'] >= self.pscores_threshold]
+
+        sequences = sequences.reset_index(drop=True).reset_index().rename(columns={'index': 'txt_id'})
+
+        sequences = sequences[['txt_id', 'sequence_id']]
+
+        self.save(sequences)
